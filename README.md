@@ -267,8 +267,8 @@ When you type a topic and click **Generate**:
 1. The topic string is sent to **Groq Llama 3.3 70B** with a structured prompt
 2. The model returns JSON: concept names, descriptions, difficulty levels (1–5), prerequisite edges, and resource URLs
 3. The backend runs a **topological sort** to validate the graph is a true DAG (no cycles)
-4. If invalid → request rejected with an error message
-5. If valid → graph saved to MySQL, immediately available in the topic switcher
+4. If invalid -> request rejected with an error message
+5. If valid -> graph saved to MySQL, immediately available in the topic switcher
 
 ---
 
@@ -359,17 +359,18 @@ Progress is fully portable — log in on any device and your state is restored f
 ```sql
 -- Users
 CREATE TABLE users (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  email      VARCHAR(255) UNIQUE NOT NULL,
-  password   VARCHAR(255) NOT NULL,          -- bcrypt hash
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id            INT AUTO_INCREMENT PRIMARY KEY,
+  email         VARCHAR(255) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,        -- bcrypt hash
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Topics (roadmaps)
 CREATE TABLE topics (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  name       VARCHAR(255) NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(255) UNIQUE NOT NULL,
+  description TEXT,
+  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Concepts (graph nodes)
@@ -377,28 +378,43 @@ CREATE TABLE concepts (
   id               INT AUTO_INCREMENT PRIMARY KEY,
   topic_id         INT NOT NULL REFERENCES topics(id),
   name             VARCHAR(255) NOT NULL,
+  difficulty_level TINYINT UNSIGNED,          -- 1 = Beginner ... 5 = Advanced
   description      TEXT,
-  difficulty_level INT DEFAULT 1,            -- 1 = Beginner … 5 = Advanced
-  resources        JSON                      -- array of URLs
+  created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  resources        TEXT                       -- JSON-encoded array of URLs
 );
 
 -- Prerequisite edges (graph edges)
-CREATE TABLE prerequisites (
-  from_concept_id INT NOT NULL REFERENCES concepts(id),
-  to_concept_id   INT NOT NULL REFERENCES concepts(id),
-  PRIMARY KEY (from_concept_id, to_concept_id)
+CREATE TABLE dependencies (
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  from_concept_id  INT NOT NULL REFERENCES concepts(id),
+  to_concept_id    INT NOT NULL REFERENCES concepts(id)
 );
 
 -- Per-user progress
 CREATE TABLE user_progress (
-  user_id    INT NOT NULL REFERENCES users(id),
-  topic_id   INT NOT NULL REFERENCES topics(id),
-  concept_id INT NOT NULL REFERENCES concepts(id),
-  mastered   BOOLEAN DEFAULT TRUE,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (user_id, topic_id, concept_id)
+  user_id      INT NOT NULL REFERENCES users(id),
+  concept_id   INT NOT NULL REFERENCES concepts(id),
+  status       ENUM('not_started', 'in_progress', 'mastered') NOT NULL,
+  last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  started_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, concept_id)
+);
+
+-- AI / learning sessions per concept
+CREATE TABLE concept_sessions (
+  -- stores per-user AI interaction history per concept
 );
 ```
+
+### Key notes
+
+- **`dependencies`** (not `prerequisites`) is the edge table, with its own auto-increment `id`
+- **`user_progress`** is keyed on `(user_id, concept_id)` — topic is inferred via the concept's own `topic_id`
+- **`status`** is a 3-value enum: `not_started` / `in_progress` / `mastered`
+- **`users.password_hash`** is the actual column name (not `password`)
+- **`resources`** on concepts is `TEXT` storing a JSON-encoded URL array
+- **`concept_sessions`** tracks AI interaction history per user per concept
 
 ---
 
@@ -439,6 +455,3 @@ Dropdown listing all your saved roadmaps. The last item always opens the AI Road
 
 ---
 
-## License
-
-MIT — free to use, modify, and distribute.
