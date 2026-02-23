@@ -1,6 +1,6 @@
 #  ConceptGraph
 
-A full-stack learning platform that visualises any subject as an interactive **directed acyclic graph (DAG)**. Mark concepts as mastered, unlock prerequisites, generate AI-powered roadmaps for any topic, and get personalised explanations, quizzes, and study suggestions — all in a sleek dark-mode interface.
+A full-stack learning platform that visualises any subject as an interactive **directed acyclic graph (DAG)**. Mark concepts as mastered, unlock prerequisites, generate AI-powered roadmaps for any topic, and get personalised explanations, quizzes, and study suggestions, all in a sleek dark-mode interface.
 
 ---
 
