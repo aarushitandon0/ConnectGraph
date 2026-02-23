@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: #060609;
+  font-family: 'IBM Plex Mono', 'Fira Code', 'Consolas', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ReactFlow overrides */
+.react-flow__controls button {
+  background: #0f0f1a !important;
+  border-color: #20203a !important;
+  color: #505070 !important;
+  fill: #505070 !important;
+}
+
+.react-flow__controls button:hover {
+  background: #141424 !important;
+  color: #9090b8 !important;
+  fill: #9090b8 !important;
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #20203a; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #2a2a48; }
+
+/* Selection */
+::selection { background: #4488ff33; }
