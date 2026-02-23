@@ -37,7 +37,7 @@ The platform ships with a **built-in DSA (Data Structures & Algorithms) roadmap*
 
 ## Features
 
-### 🗺️ Graph Visualisation
+###  Graph Visualisation
 - Interactive DAG rendered with **ReactFlow**
 - Hierarchical layout computed via longest-path BFS
 - Four concept states with distinct colours:
@@ -88,7 +88,7 @@ The platform ships with a **built-in DSA (Data Structures & Algorithms) roadmap*
 | Layer | Technology |
 |-------|-----------|
 | Frontend | React 18, ReactFlow, Axios |
-| Styling | Inline styles with design token system (no CSS files) |
+| Styling | Inline styles with design token system  |
 | Backend | FastAPI (Python) |
 | Database | MySQL |
 | AI | Groq API — Llama 3.3 70B |
